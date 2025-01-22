@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef PULSAR_COMPONENT_H
+#define PULSAR_COMPONENT_H
+
 #include "esphome/core/component.h"
 #include "esphome/core/automation.h"
 #include "esphome/components/sensor/sensor.h"
@@ -24,3 +27,5 @@ class PulsarComponent : public PollingComponent, public uart::UARTDevice {
 
 }  // namespace pulsar
 }  // namespace esphome
+
+#endif // PULSAR_COMPONENT_H
