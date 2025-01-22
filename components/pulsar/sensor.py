@@ -8,14 +8,14 @@ from esphome.const import (
     STATE_CLASS_TOTAL_INCREASING,
     CONF_ID,
     CONF_NAME,
+    CONF_UPDATE_INTERVAL,
 )
 
 DEPENDENCIES = ["uart"]
+AUTO_LOAD = ["sensor"]
 
 pulsar_ns = cg.esphome_ns.namespace("pulsar")
-PulsarComponent = pulsar_ns.class_(
-    "PulsarComponent", cg.PollingComponent, uart.UARTDevice
-)
+PulsarComponent = pulsar_ns.class_("PulsarComponent", cg.PollingComponent, uart.UARTDevice)
 
 CONFIG_SCHEMA = (
     cv.Schema(
@@ -28,9 +28,9 @@ CONFIG_SCHEMA = (
                 device_class=DEVICE_CLASS_WATER,
                 state_class=STATE_CLASS_TOTAL_INCREASING,
             ),
+            cv.Optional(CONF_UPDATE_INTERVAL, default="60s"): cv.update_interval,
         }
     )
-    .extend(cv.polling_component_schema("60s"))
     .extend(uart.UART_DEVICE_SCHEMA)
 )
 
@@ -41,3 +41,4 @@ async def to_code(config):
 
     sens = await sensor.new_sensor(config[CONF_NAME])
     cg.add(var.set_water_sensor(sens))
+    cg.add(var.set_poll_interval(config[CONF_UPDATE_INTERVAL]))
