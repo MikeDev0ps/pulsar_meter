@@ -13,7 +13,6 @@ void PulsarComponent::setup() {
 void PulsarComponent::loop() {
   uint8_t request[12];
   uint8_t response[64];
-  size_t response_length;
 
   request[0] = (this->address >> 24) & 0xFF;
   request[1] = (this->address >> 16) & 0xFF;
@@ -33,8 +32,8 @@ void PulsarComponent::loop() {
   request[11] = (crc >> 8) & 0xFF;
 
   this->write_array(request, sizeof(request));
-  if (this->read_array(response, sizeof(response), &response_length)) {
-    this->process_response(response, response_length);
+  if (this->read_array(response, sizeof(response))) {
+    this->process_response(response, sizeof(response));
   }
 }
 
