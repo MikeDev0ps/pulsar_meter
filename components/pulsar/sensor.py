@@ -13,15 +13,15 @@ CONFIG_SCHEMA = (
         {
             cv.GenerateID(): cv.declare_id(PulsarComponent),
             cv.Required("name"): sensor.sensor_schema(
-                unit_of_measurement="L",  # Используем строку вместо UNIT_LITERS
+                unit_of_measurement="L",
                 icon="mdi:water",
                 accuracy_decimals=1,
                 device_class="water",
                 state_class="total_increasing",
             ),
+            cv.Optional("update_interval", default="60s"): cv.update_interval,
         }
     )
-    .extend(cv.polling_component_schema("60s"))
     .extend(uart.UART_DEVICE_SCHEMA)
 )
 
