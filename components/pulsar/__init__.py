@@ -6,7 +6,7 @@ from esphome.const import CONF_ID
 DEPENDENCIES = ['uart']
 
 pulsar_ns = cg.esphome_ns.namespace('pulsar')
-PulsarComponent = pulsar_ns.class_('PulsarComponent', cg.Component, uart.UARTDevice)
+PulsarComponent = pulsar_ns.class_('PulsarComponent', cg.Component, uart::UARTDevice)
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(PulsarComponent),
