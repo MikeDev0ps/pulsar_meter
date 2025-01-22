@@ -13,11 +13,11 @@ CONFIG_SCHEMA = (
         {
             cv.GenerateID(): cv.declare_id(PulsarComponent),
             cv.Required("name"): sensor.sensor_schema(
-                unit_of_measurement="L",  # Используйте строку вместо UNIT_LITERS
+                unit_of_measurement="L",  # Используем строку вместо UNIT_LITERS
                 icon="mdi:water",
                 accuracy_decimals=1,
-                device_class="water",  # Используйте строку вместо DEVICE_CLASS_WATER
-                state_class="total_increasing",  # Используйте строку вместо STATE_CLASS_TOTAL_INCREASING
+                device_class="water",
+                state_class="total_increasing",
             ),
         }
     )
