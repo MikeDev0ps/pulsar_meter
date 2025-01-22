@@ -32,8 +32,11 @@ void PulsarComponent::loop() {
   request[11] = (crc >> 8) & 0xFF;
 
   this->write_array(request, sizeof(request));
-  if (this->read_array(response, sizeof(response))) {
-    this->process_response(response, sizeof(response));
+  if (this->available()) {
+    size_t len = this->read_array(response, sizeof(response));
+    if (len > 0) {
+      this->process_response(response, len);
+    }
   }
 }
 
