@@ -38,6 +38,10 @@ void PulsarComponent::dump_config() {
   LOG_SENSOR("  ", "Water Usage", this->water_sensor_);
 }
 
+void PulsarComponent::set_update_interval(uint32_t interval) {
+  this->set_interval(interval);
+}
+
 bool PulsarComponent::send_command(const uint8_t *command, size_t command_length, uint8_t *response, size_t response_length) {
   this->write_array(command, command_length);
   this->flush();
