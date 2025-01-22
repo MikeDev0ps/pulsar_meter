@@ -1,15 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor, uart
-from esphome.const import (
-    UNIT_LITERS,
-    ICON_WATER,
-    DEVICE_CLASS_WATER,
-    STATE_CLASS_TOTAL_INCREASING,
-    CONF_ID,
-    CONF_NAME,
-    CONF_UPDATE_INTERVAL,
-)
 
 DEPENDENCIES = ["uart"]
 AUTO_LOAD = ["sensor"]
@@ -21,16 +12,16 @@ CONFIG_SCHEMA = (
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(PulsarComponent),
-            cv.Required(CONF_NAME): sensor.sensor_schema(
-                unit_of_measurement=UNIT_LITERS,
-                icon=ICON_WATER,
+            cv.Required("name"): sensor.sensor_schema(
+                unit_of_measurement="L",  # Используйте строку вместо UNIT_LITERS
+                icon="mdi:water",
                 accuracy_decimals=1,
-                device_class=DEVICE_CLASS_WATER,
-                state_class=STATE_CLASS_TOTAL_INCREASING,
+                device_class="water",  # Используйте строку вместо DEVICE_CLASS_WATER
+                state_class="total_increasing",  # Используйте строку вместо STATE_CLASS_TOTAL_INCREASING
             ),
-            cv.Optional(CONF_UPDATE_INTERVAL, default="60s"): cv.update_interval,
         }
     )
+    .extend(cv.polling_component_schema("60s"))
     .extend(uart.UART_DEVICE_SCHEMA)
 )
 
@@ -39,6 +30,5 @@ async def to_code(config):
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
 
-    sens = await sensor.new_sensor(config[CONF_NAME])
+    sens = await sensor.new_sensor(config["name"])
     cg.add(var.set_water_sensor(sens))
-    cg.add(var.set_poll_interval(config[CONF_UPDATE_INTERVAL]))
