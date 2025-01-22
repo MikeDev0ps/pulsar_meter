@@ -1,27 +1,24 @@
 #pragma once
-
 #include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/uart/uart.h"
 
 namespace esphome {
 namespace pulsar {
 
-class PulsarComponent : public PollingComponent, public uart::UARTDevice {
+class PulsarComponent : public Component, public uart::UARTDevice {
  public:
-  void set_water_sensor(sensor::Sensor *water_sensor) { this->water_sensor_ = water_sensor; }
-  void set_poll_interval(uint32_t interval) { this->poll_interval_ = interval; }
+  void set_address(uint32_t address) { this->address = address; }
+  void set_channels(const std::vector<int> &channels) { this->channels = channels; }
 
   void setup() override;
-  void update() override;
-  void dump_config() override;
+  void loop() override;
 
  protected:
-  sensor::Sensor *water_sensor_{nullptr};
-  uint32_t poll_interval_{60000};  // Default: 60 seconds
+  uint32_t address;
+  std::vector<int> channels;
 
-  bool send_command(const uint8_t *command, size_t command_length, uint8_t *response, size_t response_length);
-  bool parse_response(const uint8_t *response, size_t length, uint16_t &parsed_data);
+  uint16_t calculate_crc16(const uint8_t *data, size_t length);
+  void process_response(const uint8_t *response, size_t length);
 };
 
 }  // namespace pulsar
