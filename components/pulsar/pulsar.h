@@ -1,25 +1,27 @@
 #pragma once
+
+#include <vector>
+
 #include "esphome/core/component.h"
+#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/uart/uart.h"
 
 namespace esphome {
-namespace pulsar {
+namespace a02yyuw {
 
-class PulsarComponent : public Component, public uart::UARTDevice {
+class A02yyuwComponent : public sensor::Sensor, public Component, public uart::UARTDevice {
  public:
-  void set_address(uint32_t address) { this->address = address; }
-  void set_channels(const std::vector<int> &channels) { this->channels = channels; }
+  // Nothing really public.
 
-  void setup() override;
+  // ========== INTERNAL METHODS ==========
   void loop() override;
+  void dump_config() override;
 
  protected:
-  uint32_t address;
-  std::vector<int> channels;
+  void check_buffer_();
 
-  uint16_t calculate_crc16(const uint8_t *data, size_t length);
-  void process_response(const uint8_t *response, size_t length);
+  std::vector<uint8_t> buffer_;
 };
 
-}  // namespace pulsar
+}  // namespace a02yyuw
 }  // namespace esphome

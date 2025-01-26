@@ -1,62 +1,43 @@
+// Datasheet https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311
+
 #include "pulsar.h"
+#include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace pulsar {
+namespace a02yyuw {
 
-static const char *const TAG = "pulsar";
+static const char *const TAG = "a02yyuw.sensor";
 
-void PulsarComponent::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up Pulsar Component...");
+void A02yyuwComponent::loop() {
+  uint8_t data;
+  while (this->available() > 0) {
+    this->read_byte(&data);
+    if (this->buffer_.empty() && (data != 0xff))
+      continue;
+    buffer_.push_back(data);
+    if (this->buffer_.size() == 4)
+      this->check_buffer_();
+  }
 }
 
-void PulsarComponent::loop() {
-  uint8_t request[12];
-  uint8_t response[64];
-
-  request[0] = (this->address >> 24) & 0xFF;
-  request[1] = (this->address >> 16) & 0xFF;
-  request[2] = (this->address >> 8) & 0xFF;
-  request[3] = this->address & 0xFF;
-  request[4] = 0x01;
-  request[5] = 0x0E;
-
-  uint32_t mask = 0;
-  for (int channel : this->channels) {
-    mask |= (1 << (channel - 1));
-  }
-  memcpy(&request[6], &mask, sizeof(mask));
-
-  uint16_t crc = calculate_crc16(request, 10);
-  request[10] = crc & 0xFF;
-  request[11] = (crc >> 8) & 0xFF;
-
-  this->write_array(request, sizeof(request));
-  if (this->available()) {
-    size_t len = this->read_array(response, sizeof(response));
-    if (len > 0) {
-      this->process_response(response, len);
+void A02yyuwComponent::check_buffer_() {
+  uint8_t checksum = this->buffer_[0] + this->buffer_[1] + this->buffer_[2];
+  if (this->buffer_[3] == checksum) {
+    float distance = (this->buffer_[1] << 8) + this->buffer_[2];
+    if (distance > 30) {
+      ESP_LOGV(TAG, "Distance from sensor: %f mm", distance);
+      this->publish_state(distance);
+    } else {
+      ESP_LOGW(TAG, "Invalid data read from sensor: %s", format_hex_pretty(this->buffer_).c_str());
     }
+  } else {
+    ESP_LOGW(TAG, "checksum failed: %02x != %02x", checksum, this->buffer_[3]);
   }
+  this->buffer_.clear();
 }
 
-uint16_t PulsarComponent::calculate_crc16(const uint8_t *data, size_t length) {
-  uint16_t crc = 0xFFFF;
-  for (size_t i = 0; i < length; i++) {
-    crc ^= data[i];
-    for (uint8_t j = 0; j < 8; j++) {
-      if (crc & 1)
-        crc = (crc >> 1) ^ 0xA001;
-      else
-        crc >>= 1;
-    }
-  }
-  return crc;
-}
+void A02yyuwComponent::dump_config() { LOG_SENSOR("", "A02yyuw Sensor", this); }
 
-void PulsarComponent::process_response(const uint8_t *response, size_t length) {
-  ESP_LOGD(TAG, "Processing response of length: %d", length);
-}
-
-}  // namespace pulsar
+}  // namespace a02yyuw
 }  // namespace esphome
