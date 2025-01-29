@@ -1,0 +1,7 @@
+{
+    "name": "Pulsar Water Meter",
+    "version": "1.0.0",
+    "codeowners": ["@MikeDev0ps"],
+    "dependencies": ["uart"],
+    "requirements": []
+  }
