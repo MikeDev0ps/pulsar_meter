@@ -44,3 +44,4 @@ def to_code(config):
     if CONF_ERROR_SENSOR in config:
         error_sensor = yield sensor.new_sensor(config[CONF_ERROR_SENSOR])
         cg.add(var.set_error_sensor(error_sensor))
+
