@@ -1,33 +1,30 @@
 #pragma once
+
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
-#include "esphome/components/sensor/sensor.h"
 
 namespace esphome {
 namespace pulsar_m {
 
-class PulsarM : public Component, public uart::UARTDevice {
+class PulsarMComponent : public PollingComponent, public uart::UARTDevice {
  public:
   void setup() override;
-  void loop() override;
+  void update() override;
   void dump_config() override;
 
-  void set_address(uint32_t address) { address_ = address; }
-  void set_de_pin(GPIOPin *pin) { de_pin_ = pin; }
-
-  // Сенсоры для данных и ошибок
+  void set_address(uint8_t address) { address_ = address; }
   void set_flow_sensor(sensor::Sensor *sensor) { flow_sensor_ = sensor; }
+  void set_total_sensor(sensor::Sensor *sensor) { total_sensor_ = sensor; }
   void set_error_sensor(sensor::Sensor *sensor) { error_sensor_ = sensor; }
 
  protected:
-  uint32_t address_;
-  GPIOPin *de_pin_{nullptr};
+  uint8_t address_{1};
   sensor::Sensor *flow_sensor_{nullptr};
+  sensor::Sensor *total_sensor_{nullptr};
   sensor::Sensor *error_sensor_{nullptr};
-
-  uint16_t crc16(const uint8_t *data, uint16_t len);
-  void send_request(uint8_t function_code, const std::vector<uint8_t> &data);
-  bool receive_response(std::vector<uint8_t> &response);
+  
+  bool parse_response_(const std::vector<uint8_t> &data);
+  void send_command_(uint8_t function_code);
 };
 
 }  // namespace pulsar_m
