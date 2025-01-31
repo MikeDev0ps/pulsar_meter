@@ -45,7 +45,7 @@ void PulsarMComponent::send_request(uint8_t function_code, const uint8_t *data, 
   request[index++] = crc & 0xFF;
   request[index++] = (crc >> 8) & 0xFF;
 
-  this->uart_->write_array(request, index);
+  this->write_array(request, index);
 }
 
 void PulsarMComponent::process_response(const uint8_t *data, uint8_t length) {
@@ -93,9 +93,9 @@ void PulsarMComponent::setup() {
 }
 
 void PulsarMComponent::loop() {
-  if (this->uart_->available()) {
+  if (this->available()) {
     uint8_t buffer[32];
-    int length = this->uart_->read_array(buffer, sizeof(buffer));
+    int length = this->read_array(buffer, sizeof(buffer));
     this->process_response(buffer, length);
   }
 

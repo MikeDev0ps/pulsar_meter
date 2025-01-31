@@ -7,9 +7,8 @@
 namespace esphome {
 namespace pulsar_m {
 
-class PulsarMComponent : public Component {
+class PulsarMComponent : public Component, public uart::UARTDevice {
  public:
-  void set_uart_parent(uart::UARTComponent *uart) { this->uart_ = uart; }
   void set_address(uint32_t address) { this->address_ = address; }
   void setup() override;
   void loop() override;
@@ -20,7 +19,6 @@ class PulsarMComponent : public Component {
 
  protected:
   uint32_t address_;
-  uart::UARTComponent *uart_{nullptr};
   sensor::Sensor *total_volume_sensor_{nullptr};
   sensor::Sensor *error_sensor_{nullptr};
 
